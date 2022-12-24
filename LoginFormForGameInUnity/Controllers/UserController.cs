@@ -1,4 +1,5 @@
-﻿using LoginFormForGameInUnity.Data;
+﻿using LoginFormForGameInUnity.Attributes;
+using LoginFormForGameInUnity.Data;
 using LoginFormForGameInUnity.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ namespace LoginFormForGameInUnity.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [BasicAuthenticationAttributeFilter]
     public class UserController : ControllerBase
     {
         private readonly DataContext _context;

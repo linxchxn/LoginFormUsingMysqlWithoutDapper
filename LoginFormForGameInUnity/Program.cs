@@ -1,5 +1,7 @@
+using LoginFormForGameInUnity.Attributes;
 using LoginFormForGameInUnity.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +20,42 @@ builder.Services.AddDbContext<DataContext>(options =>
 
 
 
+#region swagger
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "My Sample FormLogin WebAPI",
+        Description = "My Sample FormLogin WebAPI"
+    });
+
+    c.AddSecurityDefinition("Basic", new OpenApiSecurityScheme { In = ParameterLocation.Header, Description = "Please add Basic Token", Name = "Authorization", Type = SecuritySchemeType.ApiKey, Scheme = "Basic" });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                 {
+                   {
+                        new OpenApiSecurityScheme
+                        {
+                       Reference = new OpenApiReference {
+                         Type = ReferenceType.SecurityScheme,
+                         Id = "Basic"
+                     }
+                     },
+                   new string[] { }
+                  }
+                });
+
+    var basePath = Directory.GetCurrentDirectory();
+    var xmlPath = Path.Combine(basePath, "WebAPI.xml");
+    c.IncludeXmlComments(xmlPath);
+    c.DocumentFilter<HiddenApiFilter>();
+    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+});
+#endregion
+
+
+
 var app = builder.Build();
 
 //// Configure the HTTP request pipeline.
@@ -31,7 +69,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
